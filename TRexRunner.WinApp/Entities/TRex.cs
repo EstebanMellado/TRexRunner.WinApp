@@ -36,5 +36,10 @@ namespace TRexRunner.WinApp.Entities
         {
             //throw new NotImplementedException();
         }
+
+        internal static int GetHeight()
+        {
+            return TREX_DEFAULT_SPRITE_POS_HEIGHT;
+        }
     }
 }

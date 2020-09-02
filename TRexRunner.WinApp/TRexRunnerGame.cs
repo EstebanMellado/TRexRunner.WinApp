@@ -17,6 +17,12 @@ namespace TRexRunner.WinApp
         private const string ASSET_NAME_SFX_SCORE_REACHED = "scoreReached";
         private const string ASSET_NAME_SFX_BUTTON_PRESS = "buttonPress";
 
+        public const int WINDOW_WIDTH = 600;
+        public const int WINDOW_HEIGHT = 150;
+
+        public const int TREX_START_POS_X = 1;
+        public const int TREX_START_POS_Y = WINDOW_HEIGHT - 16;
+
         private Texture2D _spriteSheetTexture;
         private SoundEffect _sfxHit;
         private SoundEffect _sfxButtonPress;
@@ -36,6 +42,10 @@ namespace TRexRunner.WinApp
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            _graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
+            _graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
+            _graphics.ApplyChanges();
         }
 
         protected override void LoadContent()
@@ -48,7 +58,7 @@ namespace TRexRunner.WinApp
             _sfxButtonPress = Content.Load<SoundEffect>(ASSET_NAME_SFX_BUTTON_PRESS);
             _sfxScoredReached = Content.Load<SoundEffect>(ASSET_NAME_SFX_SCORE_REACHED);
 
-            _tRex = new TRex(_spriteSheetTexture, new Vector2(20, 20));
+            _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()));
         }
 
         protected override void Update(GameTime gameTime)
@@ -63,7 +73,7 @@ namespace TRexRunner.WinApp
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
