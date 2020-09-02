@@ -59,6 +59,7 @@ namespace TRexRunner.WinApp
             _sfxScoredReached = Content.Load<SoundEffect>(ASSET_NAME_SFX_SCORE_REACHED);
 
             _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()));
+
         }
 
         protected override void Update(GameTime gameTime)

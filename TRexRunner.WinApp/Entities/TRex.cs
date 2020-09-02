@@ -1,18 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using TRexRunner.WinApp.Graphics;
 
 namespace TRexRunner.WinApp.Entities
 {
     public class TRex : IGameEntity
     {
+        private const int TREX_IDLE_BACKGROUND_SPRITE_POS_X = 40;
+        private const int TREX_IDLE_BACKGROUND_SPRITE_POS_Y = 0;
+
         private const int TREX_DEFAULT_SPRITE_POS_X = 848;
         private const int TREX_DEFAULT_SPRITE_POS_Y = 0;
         private const int TREX_DEFAULT_SPRITE_POS_WIDTH = 44;
         private const int TREX_DEFAULT_SPRITE_POS_HEIGHT = 52;
+
+        private Sprite _idleBackgroundSprite;
 
         public int DrawOrder { get; set; }
         public Vector2 Position { get; set; }
@@ -25,10 +27,17 @@ namespace TRexRunner.WinApp.Entities
         {
             Sprite = new Sprite(spriteBatch, TREX_DEFAULT_SPRITE_POS_X, TREX_DEFAULT_SPRITE_POS_Y, TREX_DEFAULT_SPRITE_POS_WIDTH, TREX_DEFAULT_SPRITE_POS_HEIGHT);
             Position = position;
+            _idleBackgroundSprite = new Sprite(spriteBatch, TREX_IDLE_BACKGROUND_SPRITE_POS_X, TREX_IDLE_BACKGROUND_SPRITE_POS_Y, TREX_DEFAULT_SPRITE_POS_WIDTH, TREX_DEFAULT_SPRITE_POS_HEIGHT);
+            State = TRexState.Idle;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            if(State == TRexState.Idle)
+            {
+                _idleBackgroundSprite.Draw(spriteBatch, Position);
+            }
+
             Sprite.Draw(spriteBatch, Position);
         }
 
