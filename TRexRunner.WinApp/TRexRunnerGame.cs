@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TRexRunner.WinApp.Graphics;
 
 namespace TRexRunner.WinApp
 {
@@ -61,7 +62,11 @@ namespace TRexRunner.WinApp
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
-            _spriteBatch.Draw(_spriteSheetTexture, new Vector2(10, 10), new Rectangle(848, 0, 44, 52), Color.White);
+
+            //_spriteBatch.Draw(_spriteSheetTexture, new Vector2(10, 10), new Rectangle(848, 0, 44, 52), Color.White);
+            Sprite trexSprite = new Sprite(_spriteSheetTexture, 848, 0, 44, 52);
+            trexSprite.Draw(_spriteBatch, new Vector2(20, 20));
+
             _spriteBatch.End();
 
             base.Draw(gameTime);
