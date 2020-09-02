@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TRexRunner.WinApp.Entities;
 using TRexRunner.WinApp.Graphics;
 
 namespace TRexRunner.WinApp
@@ -20,6 +21,8 @@ namespace TRexRunner.WinApp
         private SoundEffect _sfxHit;
         private SoundEffect _sfxButtonPress;
         private SoundEffect _sfxScoredReached;
+
+        private TRex _tRex;
 
         public TRexRunnerGame()
         {
@@ -44,6 +47,8 @@ namespace TRexRunner.WinApp
             _sfxHit = Content.Load<SoundEffect>(ASSET_NAME_SFX_HIT);
             _sfxButtonPress = Content.Load<SoundEffect>(ASSET_NAME_SFX_BUTTON_PRESS);
             _sfxScoredReached = Content.Load<SoundEffect>(ASSET_NAME_SFX_SCORE_REACHED);
+
+            _tRex = new TRex(_spriteSheetTexture, new Vector2(20, 20));
         }
 
         protected override void Update(GameTime gameTime)
@@ -63,9 +68,7 @@ namespace TRexRunner.WinApp
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
 
-            //_spriteBatch.Draw(_spriteSheetTexture, new Vector2(10, 10), new Rectangle(848, 0, 44, 52), Color.White);
-            Sprite trexSprite = new Sprite(_spriteSheetTexture, 848, 0, 44, 52);
-            trexSprite.Draw(_spriteBatch, new Vector2(20, 20));
+            _tRex.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
 
