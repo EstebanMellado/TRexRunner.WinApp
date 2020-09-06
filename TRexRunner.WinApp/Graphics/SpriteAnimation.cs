@@ -84,5 +84,11 @@ namespace TRexRunner.WinApp.Graphics
             if (frame != null)
                 frame.Sprite.Draw(spriteBatch, position);
         }
+
+        public void Clear()
+        {
+            Stop();
+            _frames.Clear();
+        }
     }
 }

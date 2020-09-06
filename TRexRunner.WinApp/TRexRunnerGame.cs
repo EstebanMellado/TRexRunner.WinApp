@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TRexRunner.WinApp.Entities;
-using TRexRunner.WinApp.Graphics;
+using TRexRunner.WinApp.System;
 
 namespace TRexRunner.WinApp
 {
@@ -29,6 +29,7 @@ namespace TRexRunner.WinApp
         private SoundEffect _sfxScoredReached;
 
         private TRex _tRex;
+        private InputController _inputController;
 
         public TRexRunnerGame()
         {
@@ -58,8 +59,8 @@ namespace TRexRunner.WinApp
             _sfxButtonPress = Content.Load<SoundEffect>(ASSET_NAME_SFX_BUTTON_PRESS);
             _sfxScoredReached = Content.Load<SoundEffect>(ASSET_NAME_SFX_SCORE_REACHED);
 
-            _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()));
-
+            _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()), _sfxButtonPress);
+            _inputController = new InputController(_tRex);
         }
 
         protected override void Update(GameTime gameTime)
@@ -70,6 +71,8 @@ namespace TRexRunner.WinApp
             // TODO: Add your update logic here
 
             base.Update(gameTime);
+
+            _inputController.ProcessControls(gameTime);
 
             _tRex.Update(gameTime);
         }
