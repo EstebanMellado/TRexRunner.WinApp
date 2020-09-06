@@ -70,6 +70,8 @@ namespace TRexRunner.WinApp
             // TODO: Add your update logic here
 
             base.Update(gameTime);
+
+            _tRex.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
