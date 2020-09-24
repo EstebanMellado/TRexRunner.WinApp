@@ -40,7 +40,7 @@ namespace TRexRunner.WinApp
 
         private KeyboardState _previousKeyboardState;
 
-        public GameState State { get; set; }
+        public GameState State { get; private set; }
 
         public TRexRunnerGame()
         {
@@ -49,7 +49,7 @@ namespace TRexRunner.WinApp
             IsMouseVisible = true;
             _entityManager = new EntityManager();
             State = GameState.Initial;
-            _fadeInTexturePosX = TRex.GetHeight();
+            _fadeInTexturePosX = TRex.GetWidth();
         }
 
         protected override void Initialize()
@@ -83,8 +83,10 @@ namespace TRexRunner.WinApp
             _inputController = new InputController(_tRex);
 
             _groundManager = new GroundManager(_spriteSheetTexture, _entityManager, _tRex);
+
             _entityManager.AddEntity(_tRex);
             _entityManager.AddEntity(_groundManager);
+
             _groundManager.Initialize();
         }
 

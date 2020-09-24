@@ -57,6 +57,11 @@ namespace TRexRunner.WinApp.Entities
             return TREX_DEFAULT_SPRITE_HEIGHT;
         }
 
+        internal static int GetWidth()
+        {
+            return TREX_DEFAULT_SPRITE_WIDTH;
+        }
+
         public TRex(Texture2D spriteSheet, Vector2 position, SoundEffect jumpSound)
         {
             Position = position;

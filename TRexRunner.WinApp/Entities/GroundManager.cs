@@ -19,7 +19,7 @@ namespace TRexRunner.WinApp.Entities
         private const float GORUND_TILE_POS_Y = 119;
 
         private Texture2D _spriteSheet;
-        private readonly List<GroundTile> _gorundTiles;
+        private readonly List<GroundTile> _groundTiles;
         private EntityManager _entityManager;
         private Sprite _regularSprite;
         private Sprite _bumpySprite;
@@ -33,7 +33,7 @@ namespace TRexRunner.WinApp.Entities
         public GroundManager(Texture2D spriteSheet, EntityManager entityManager, TRex tRex)
         {
             _spriteSheet = spriteSheet;
-            _gorundTiles = new List<GroundTile>();
+            _groundTiles = new List<GroundTile>();
             _entityManager = entityManager;
             _regularSprite = new Sprite(spriteSheet, SPRITE_POS_X, SPRITE_POS_Y, SPRITE_WIDTH, SPRITE_HEIGHT);
             _bumpySprite = new Sprite(spriteSheet, SPRITE_POS_X + SPRITE_WIDTH, SPRITE_POS_Y, SPRITE_WIDTH, SPRITE_HEIGHT);
@@ -47,39 +47,39 @@ namespace TRexRunner.WinApp.Entities
 
         public void Update(GameTime gameTime)
         {
-            if (_gorundTiles.Any())
+            if (_groundTiles.Any())
             {
-                float maxPosX = _gorundTiles.Max(g => g.PositionX);
+                float maxPosX = _groundTiles.Max(g => g.PositionX);
 
                 if (maxPosX < 0)
                     SpawnTile(maxPosX);
             }
 
-            List<GroundTile> tileToRemove = new List<GroundTile>();
+            List<GroundTile> tilesToRemove = new List<GroundTile>();
 
-            foreach (GroundTile groundTile in _gorundTiles)
+            foreach (GroundTile groundTile in _groundTiles)
             {
                 groundTile.PositionX -= _tRex.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 if (groundTile.PositionX < -SPRITE_WIDTH)
                 {
                     _entityManager.RemoveEntity(groundTile);
-                    tileToRemove.Add(groundTile);
+                    tilesToRemove.Add(groundTile);
                 }
             }
 
-            foreach (GroundTile ground in tileToRemove)
+            foreach (GroundTile ground in tilesToRemove)
             {
-                _gorundTiles.Remove(ground);
+                _groundTiles.Remove(ground);
             }
         }
 
         public void Initialize()
         {
-            _gorundTiles.Clear();
+            _groundTiles.Clear();
 
             GroundTile groundTile = CreateRegularTile(0);
-            _gorundTiles.Add(groundTile);
+            _groundTiles.Add(groundTile);
 
             _entityManager.AddEntity(groundTile);
         }
@@ -100,7 +100,7 @@ namespace TRexRunner.WinApp.Entities
         {
             double randomNumber = _random.NextDouble();
             GroundTile groundTile;
-            float posX = _gorundTiles.Max(g => g.PositionX) + SPRITE_WIDTH;
+            float posX = maxPosX + SPRITE_WIDTH;
 
             if (randomNumber > 0.5)
             {
@@ -112,7 +112,7 @@ namespace TRexRunner.WinApp.Entities
             }
 
             _entityManager.AddEntity(groundTile);
-            _gorundTiles.Add(groundTile);
+            _groundTiles.Add(groundTile);
         }
     }
 }
