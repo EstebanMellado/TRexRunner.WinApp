@@ -79,6 +79,7 @@ namespace TRexRunner.WinApp
 
             _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()), _sfxButtonPress);
             _tRex.DrawOrder = 10;
+            _tRex.JumpComplete += tRex_JumpComplete;
 
             _inputController = new InputController(_tRex);
 
@@ -88,6 +89,15 @@ namespace TRexRunner.WinApp
             _entityManager.AddEntity(_groundManager);
 
             _groundManager.Initialize();
+        }
+
+        private void tRex_JumpComplete(object sender, EventArgs e)
+        {
+            if(State == GameState.Transition)
+            {
+                State = GameState.Playing;
+                _tRex.Initialize();
+            }
         }
 
         protected override void Update(GameTime gameTime)

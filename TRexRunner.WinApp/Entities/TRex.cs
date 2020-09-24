@@ -30,6 +30,7 @@ namespace TRexRunner.WinApp.Entities
         private const float GRAVITY = 1600f;
         private const float RUN_ANIMATION_FRAME_LENGTH = 0.1f;
         private const float DROP_VELOCITY = 600f;
+        private const float START_SPEED = 240f;
 
         private SoundEffect _jumpSound;
 
@@ -45,6 +46,8 @@ namespace TRexRunner.WinApp.Entities
         private float _verticalVelocity;
         private float _startPosY;
         private float _dropVelocity;
+
+        public event EventHandler JumpComplete;
 
         public int DrawOrder { get; set; }
         public Vector2 Position { get; set; }
@@ -87,6 +90,12 @@ namespace TRexRunner.WinApp.Entities
             _duckAnimation.AddFrame(new Sprite(spriteSheet, TREX_DUCKING_SPRITE_ONE_POS_X + TREX_DUCKING_SPRITE_WIDTH, TREX_DUCKING_SPRITE_ONE_POS_Y, TREX_DUCKING_SPRITE_WIDTH, TREX_DEFAULT_SPRITE_HEIGHT), RUN_ANIMATION_FRAME_LENGTH);
             _duckAnimation.AddFrame(_duckAnimation[0].Sprite, RUN_ANIMATION_FRAME_LENGTH * 2);
             _duckAnimation.Play();
+        }
+
+        public void Initialize()
+        {
+            Speed = START_SPEED;
+            State = TRexState.Running;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -134,6 +143,7 @@ namespace TRexRunner.WinApp.Entities
                     Position = new Vector2(Position.X, _startPosY);
                     _verticalVelocity = 0;
                     State = TRexState.Running;
+                    OnJumpComplete();
                 }
             }
             else if (State == TRexState.Running)
@@ -204,6 +214,12 @@ namespace TRexRunner.WinApp.Entities
             _dropVelocity = DROP_VELOCITY;
 
             return true;
+        }
+
+        protected virtual void OnJumpComplete()
+        {
+            EventHandler handler = JumpComplete;
+            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }
