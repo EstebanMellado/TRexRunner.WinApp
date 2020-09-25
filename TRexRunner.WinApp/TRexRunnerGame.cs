@@ -37,6 +37,7 @@ namespace TRexRunner.WinApp
         private InputController _inputController;
         private EntityManager _entityManager;
         private GroundManager _groundManager;
+        private ScoreBoard _scoreBoard;
 
         private KeyboardState _previousKeyboardState;
 
@@ -81,12 +82,16 @@ namespace TRexRunner.WinApp
             _tRex.DrawOrder = 10;
             _tRex.JumpComplete += tRex_JumpComplete;
 
+            _scoreBoard = new ScoreBoard(_spriteSheetTexture, new Vector2(WINDOW_WIDTH - 100, 10));
+            _scoreBoard.Score = 498;
+
             _inputController = new InputController(_tRex);
 
             _groundManager = new GroundManager(_spriteSheetTexture, _entityManager, _tRex);
 
             _entityManager.AddEntity(_tRex);
             _entityManager.AddEntity(_groundManager);
+            _entityManager.AddEntity(_scoreBoard);
 
             _groundManager.Initialize();
         }
