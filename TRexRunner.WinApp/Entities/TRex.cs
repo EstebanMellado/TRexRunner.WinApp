@@ -6,7 +6,7 @@ using TRexRunner.WinApp.Graphics;
 
 namespace TRexRunner.WinApp.Entities
 {
-    public class TRex : IGameEntity
+    public class TRex : IGameEntity, ICollidable
     {
         private const int TREX_DEFAULT_SPRITE_POS_X = 848;
         private const int TREX_DEFAULT_SPRITE_POS_Y = 0;
@@ -15,11 +15,18 @@ namespace TRexRunner.WinApp.Entities
 
         private const int TREX_IDLE_BACKGROUND_SPRITE_POS_X = 40;
         private const int TREX_IDLE_BACKGROUND_SPRITE_POS_Y = 0;
+
         private const int TREX_RUNNING_SPRITE_ONE_POS_X = TREX_DEFAULT_SPRITE_POS_X + TREX_DEFAULT_SPRITE_WIDTH * 2;
         private const int TREX_RUNNING_SPRITE_ONE_POS_Y = 0;
+
         private const int TREX_DUCKING_SPRITE_WIDTH = 59;
         private const int TREX_DUCKING_SPRITE_ONE_POS_X = TREX_DEFAULT_SPRITE_POS_X + TREX_DEFAULT_SPRITE_WIDTH * 6;
         private const int TREX_DUCKING_SPRITE_ONE_POS_Y = 0;
+
+        private const int TREX_DEAD_SPRITE_POS_X = 1068;
+        private const int TREX_DEAD_SPRITE_POS_Y = 0;
+
+        private const int COLLISION_BOX_INSET = 3;
 
         private const float BLINK_ANIMATION_RANDOM_MIN = 2f;
         private const float BLINK_ANIMATION_RANDOM_MAX = 10f;
@@ -30,13 +37,17 @@ namespace TRexRunner.WinApp.Entities
         private const float GRAVITY = 1600f;
         private const float RUN_ANIMATION_FRAME_LENGTH = 0.1f;
         private const float DROP_VELOCITY = 600f;
-        private const float START_SPEED = 240f;
+        private const float ACELERATION_PPS_PER_SECOND = 5f;
+
+        public const float START_SPEED = 280f;
+        public const float MAX_SPEED = 900f;
 
         private SoundEffect _jumpSound;
 
         private Sprite _idleBackgroundSprite;
         private Sprite _idleSprite;
         private Sprite _idleBlinkSprite;
+        private Sprite _deadSprite;
 
         private SpriteAnimation _blinkAnimation;
         private SpriteAnimation _runAnimation;
@@ -48,12 +59,23 @@ namespace TRexRunner.WinApp.Entities
         private float _dropVelocity;
 
         public event EventHandler JumpComplete;
+        public event EventHandler Died;
 
         public int DrawOrder { get; set; }
         public Vector2 Position { get; set; }
         public TRexState State { get; private set; }
         public bool IsAlive { get; private set; }
         public float Speed { get; private set; }
+
+        public Rectangle CollisionBox
+        {
+            get
+            {
+                Rectangle box = new Rectangle((int)Math.Round(Position.X), (int)Math.Round(Position.Y), TREX_DEFAULT_SPRITE_WIDTH, TREX_DEFAULT_SPRITE_HEIGHT);
+                box.Inflate(-COLLISION_BOX_INSET, -COLLISION_BOX_INSET);
+                return box;
+            }
+        }
 
         internal static int GetHeight()
         {
@@ -90,6 +112,10 @@ namespace TRexRunner.WinApp.Entities
             _duckAnimation.AddFrame(new Sprite(spriteSheet, TREX_DUCKING_SPRITE_ONE_POS_X + TREX_DUCKING_SPRITE_WIDTH, TREX_DUCKING_SPRITE_ONE_POS_Y, TREX_DUCKING_SPRITE_WIDTH, TREX_DEFAULT_SPRITE_HEIGHT), RUN_ANIMATION_FRAME_LENGTH);
             _duckAnimation.AddFrame(_duckAnimation[0].Sprite, RUN_ANIMATION_FRAME_LENGTH * 2);
             _duckAnimation.Play();
+
+            _deadSprite = new Sprite(spriteSheet, TREX_DEAD_SPRITE_POS_X, TREX_DEAD_SPRITE_POS_Y, TREX_DEFAULT_SPRITE_WIDTH, TREX_DEFAULT_SPRITE_HEIGHT);
+
+            IsAlive = true;
         }
 
         public void Initialize()
@@ -100,22 +126,29 @@ namespace TRexRunner.WinApp.Entities
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if (State == TRexState.Idle)
+            if (IsAlive)
             {
-                _idleBackgroundSprite.Draw(spriteBatch, Position);
-                _blinkAnimation.Draw(spriteBatch, Position);
+                if (State == TRexState.Idle)
+                {
+                    _idleBackgroundSprite.Draw(spriteBatch, Position);
+                    _blinkAnimation.Draw(spriteBatch, Position);
+                }
+                else if (State == TRexState.Jumping || State == TRexState.Falling)
+                {
+                    _idleSprite.Draw(spriteBatch, Position);
+                }
+                else if (State == TRexState.Running)
+                {
+                    _runAnimation.Draw(spriteBatch, Position);
+                }
+                else if (State == TRexState.Ducking)
+                {
+                    _duckAnimation.Draw(spriteBatch, Position);
+                }
             }
-            else if (State == TRexState.Jumping || State == TRexState.Falling)
+            else
             {
-                _idleSprite.Draw(spriteBatch, Position);
-            }
-            else if (State == TRexState.Running)
-            {
-                _runAnimation.Draw(spriteBatch, Position);
-            }
-            else if (State == TRexState.Ducking)
-            {
-                _duckAnimation.Draw(spriteBatch, Position);
+                _deadSprite.Draw(spriteBatch, Position);
             }
         }
 
@@ -155,6 +188,12 @@ namespace TRexRunner.WinApp.Entities
                 _duckAnimation.Update(gameTime);
             }
 
+            if (State != TRexState.Idle)
+                Speed += ACELERATION_PPS_PER_SECOND * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (Speed > MAX_SPEED)
+                Speed = MAX_SPEED;
+
             _dropVelocity = 0;
         }
 
@@ -182,7 +221,7 @@ namespace TRexRunner.WinApp.Entities
         {
             if (State != TRexState.Jumping || (_startPosY - Position.Y) < MIN_JUMP_HEIGHT)
                 return false;
-            
+
             _verticalVelocity = _verticalVelocity < CANCEL_JUMP_VELOCITY ? CANCEL_JUMP_VELOCITY : 0;
             return true;
         }
@@ -220,6 +259,26 @@ namespace TRexRunner.WinApp.Entities
         {
             EventHandler handler = JumpComplete;
             handler?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnDied()
+        {
+            EventHandler handler = Died;
+            handler?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool Die()
+        {
+            if (!IsAlive)
+                return false;
+
+            State = TRexState.Idle;
+            Speed = 0;
+            IsAlive = false;
+
+            OnDied();
+
+            return true;
         }
     }
 }

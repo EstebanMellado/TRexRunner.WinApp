@@ -41,6 +41,8 @@ namespace TRexRunner.WinApp
         private EntityManager _entityManager;
         private GroundManager _groundManager;
         private ScoreBoard _scoreBoard;
+        private ObstacleManager _obstacleManager;
+        private GameOverScreen _gameOverScreen;
 
         private KeyboardState _previousKeyboardState;
 
@@ -84,26 +86,42 @@ namespace TRexRunner.WinApp
             _tRex = new TRex(_spriteSheetTexture, new Vector2(TREX_START_POS_X, TREX_START_POS_Y - TRex.GetHeight()), _sfxButtonPress);
             _tRex.DrawOrder = 10;
             _tRex.JumpComplete += tRex_JumpComplete;
+            _tRex.Died += tRex_Died;
 
             _scoreBoard = new ScoreBoard(_spriteSheetTexture, new Vector2(SCORE_BOARD_POS_X, SCORE_BOARD_POS_y), _tRex);
 
             _inputController = new InputController(_tRex);
 
             _groundManager = new GroundManager(_spriteSheetTexture, _entityManager, _tRex);
+            _obstacleManager = new ObstacleManager(_entityManager, _tRex, _scoreBoard, _spriteSheetTexture);
+
+            _gameOverScreen = new GameOverScreen(_spriteSheetTexture);
+            _gameOverScreen.Position = new Vector2(WINDOW_WIDTH / 2 - GameOverScreen.GAME_OVER_SPRITE_WIDTH / 2, WINDOW_HEIGHT / 2 - 30);
 
             _entityManager.AddEntity(_tRex);
             _entityManager.AddEntity(_groundManager);
             _entityManager.AddEntity(_scoreBoard);
+            _entityManager.AddEntity(_obstacleManager);
+            _entityManager.AddEntity(_gameOverScreen);
 
             _groundManager.Initialize();
         }
 
+        private void tRex_Died(object sender, EventArgs e)
+        {
+            State = GameState.GameOver;
+            _obstacleManager.IsEnabled = false;
+            _gameOverScreen.IsEnabled = true;
+        }
+
         private void tRex_JumpComplete(object sender, EventArgs e)
         {
-            if(State == GameState.Transition)
+            if (State == GameState.Transition)
             {
                 State = GameState.Playing;
                 _tRex.Initialize();
+
+                _obstacleManager.IsEnabled = true;
             }
         }
 
