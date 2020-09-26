@@ -122,6 +122,8 @@ namespace TRexRunner.WinApp.Entities
         {
             Speed = START_SPEED;
             State = TRexState.Running;
+            IsAlive = true;
+            Position = new Vector2(Position.X, _startPosY);
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)

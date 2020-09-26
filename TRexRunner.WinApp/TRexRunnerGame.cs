@@ -95,7 +95,7 @@ namespace TRexRunner.WinApp
             _groundManager = new GroundManager(_spriteSheetTexture, _entityManager, _tRex);
             _obstacleManager = new ObstacleManager(_entityManager, _tRex, _scoreBoard, _spriteSheetTexture);
 
-            _gameOverScreen = new GameOverScreen(_spriteSheetTexture);
+            _gameOverScreen = new GameOverScreen(_spriteSheetTexture, this);
             _gameOverScreen.Position = new Vector2(WINDOW_WIDTH / 2 - GameOverScreen.GAME_OVER_SPRITE_WIDTH / 2, WINDOW_HEIGHT / 2 - 30);
 
             _entityManager.AddEntity(_tRex);
@@ -182,6 +182,23 @@ namespace TRexRunner.WinApp
 
             State = GameState.Transition;
             _tRex.BeginJump();
+
+            return true;
+        }
+
+        public bool Replay()
+        {
+            if (State != GameState.GameOver)
+                return false;
+
+            State = GameState.Playing;
+            _tRex.Initialize();
+
+            _obstacleManager.Reset();
+            _obstacleManager.IsEnabled = true;
+
+            _gameOverScreen.IsEnabled = false;
+            _scoreBoard.Score = 0;
 
             return true;
         }
