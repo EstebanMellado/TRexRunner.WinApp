@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TRexRunner.WinApp.Entities
 {
@@ -13,26 +11,50 @@ namespace TRexRunner.WinApp.Entities
         private const int TEXTURE_COORDS_NUMBER_WIDTH = 10;
         private const int TEXTURE_COORDS_NUMBER_HEIGHT = 13;
         private const byte NUMBER_DIGITS_TO_DRAW = 5;
+        private const int SCORE_MARGIN = 70;
+        private const int TEXTURE_COORDS_HI_X = 755;
+        private const int TEXTURE_COORDS_HI_Y = 0;
+        private const int TEXTURE_COORDS_HI_WIDTH = 20;
+        private const int TEXTURE_COORDS_HI_HEIGHT = 13;
+
+        private const int HI_TEXT_MARGIN = 28;
+        private const float SCORE_INCREMENT_MULTIPLIER = 0.05f;
 
         private Texture2D _texture;
+
+        private TRex _trex;
 
         public double Score { get; set; }
         public int DisplayScore => (int)Math.Floor(Score);
         public int HighScore { get; set; }
 
+        public bool HasHighScore => HighScore > 0;
         public int DrawOrder => 100;
         public Vector2 Position { get; set; }
 
-        public ScoreBoard(Texture2D texture, Vector2 position)
+        public ScoreBoard(Texture2D texture, Vector2 position, TRex trex)
         {
             _texture = texture;
             Position = position;
+            _trex = trex;
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            int[] scoreDigits = SplitDigits(DisplayScore);
-            float posX = Position.X;
+
+            if (HasHighScore)
+            {
+                spriteBatch.Draw(_texture, new Vector2(Position.X - HI_TEXT_MARGIN, Position.Y), new Rectangle(TEXTURE_COORDS_HI_X, TEXTURE_COORDS_HI_Y, TEXTURE_COORDS_HI_WIDTH, TEXTURE_COORDS_HI_HEIGHT), Color.White);
+                DrawScore(spriteBatch, HighScore, Position.X);
+            }
+
+            DrawScore(spriteBatch, DisplayScore, Position.X + SCORE_MARGIN);
+        }
+
+        private void DrawScore(SpriteBatch spriteBatch, int score, float startPosX)
+        {
+            int[] scoreDigits = SplitDigits(score);
+            float posX = startPosX;
 
             foreach (int digit in scoreDigits)
             {
@@ -47,7 +69,7 @@ namespace TRexRunner.WinApp.Entities
 
         public void Update(GameTime gameTime)
         {
-
+            Score += _trex.Speed * SCORE_INCREMENT_MULTIPLIER * gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         private Rectangle GetDigitTextureBounds(int digit)

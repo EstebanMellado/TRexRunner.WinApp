@@ -24,6 +24,9 @@ namespace TRexRunner.WinApp
         public const int TREX_START_POS_X = 1;
         public const int TREX_START_POS_Y = WINDOW_HEIGHT - 16;
         private const float FADE_IN_ANIMATION_SPEED = 820f;
+        private const int SCORE_BOARD_POS_X = WINDOW_WIDTH - 130;
+        private const int SCORE_BOARD_POS_y = 10;
+
         private Texture2D _spriteSheetTexture;
         private Texture2D _fadeInTexture;
 
@@ -82,8 +85,7 @@ namespace TRexRunner.WinApp
             _tRex.DrawOrder = 10;
             _tRex.JumpComplete += tRex_JumpComplete;
 
-            _scoreBoard = new ScoreBoard(_spriteSheetTexture, new Vector2(WINDOW_WIDTH - 100, 10));
-            _scoreBoard.Score = 498;
+            _scoreBoard = new ScoreBoard(_spriteSheetTexture, new Vector2(SCORE_BOARD_POS_X, SCORE_BOARD_POS_y), _tRex);
 
             _inputController = new InputController(_tRex);
 
